@@ -1,0 +1,207 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Drawable
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Item
+use Libraries.Sound.Audio
+use Libraries.Sound.Music
+
+use Frog
+//use BackgroundMusic
+/*
+    This is a default class for creating a game in Quorum. Note that the Main 
+    action begins by calling StartGame(), which loads a window a game can 
+    be displayed in. The action CreateGame is where the game should load any 
+    assets, like images to be displayed, frames of animation, or sounds to be
+    played. 
+*/
+
+class Main is Game, KeyboardListener
+    Drawable street      // race track for tortoise and hare to race on
+    Drawable grass
+    Drawable tortoise         // tortoise
+    
+    Sprite car1
+    Sprite car2
+    Sprite car3
+    Sprite car4
+
+    Audio aud
+    Audio bg
+    Audio yey
+
+    Frog frog
+    Game thisGame
+
+    boolean done = false
+
+    /*
+        This action, Main, starts our computer program. In Quorum, programs always
+        begin from Main.
+    */
+
+    action Main
+        SetScreenSize(770, 800)
+        StartGame()
+       
+    end
+
+    /*
+        This action sets up the default values for a game. For example, we might
+        use the Libraries.Game.Graphics.Drawable class to load up an image or 
+        a shape. Or, we might add a Libraries.Interface.Button for making something clickable
+        or a Libraries.Interface.TextBox for gathering user input in a game.
+    */
+
+    action CreateGame
+
+    //bg:PlayBG()
+
+    street:Load("simple-fourLane.png")
+    street:SetPosition(0, 0)
+    Add(street)
+
+    grass:Load("grass.png")
+    grass:SetPosition(0, 740)
+    Add(grass)
+
+    car1:Load("car_car.png")
+    Add(car1)
+    car1:SetInitialPosition(630, 600)
+    car1:SetSpeed(200)
+
+    car2:Load("motorcycle_PNG3132.png")
+    Add(car2)
+    car2:SetInitialPosition(10, 350)
+    car2:SetSpeed(250)
+
+    car3:Load("truck.png")
+    Add(car3)
+    car3:SetInitialPosition(10, 150)
+    car3:SetSpeed(150)
+
+    car4:Load("infantry-stryker.png")
+    Add(car4)
+    car4:SetInitialPosition(10, 450)
+    car4:SetSpeed(100)
+
+    
+
+    tortoise:Load("tortoise.png")
+    Add(tortoise)
+    tortoise:SetPosition(350, 740)
+    
+    frog:Load()
+    Add(frog)
+
+    aud:Load("Sound/Urban Traffic.wav")
+    aud:EnableLooping()
+    aud:Play()
+   
+    bg:Load("Mission_Impossible.ogg")
+    bg:Play()
+
+    AddKeyboardListener(frog)
+     
+    AddCollisionListener(frog)
+    AddCollisionListener(car1)
+    AddCollisionListener(car2)
+    AddCollisionListener(car3)
+    AddCollisionListener(car4)
+     
+    
+        repeat 100 times
+        car1:MoveTo(0, 600)
+        car1:MoveTo(640, 600) 
+        end
+
+        repeat 100 times
+        car2:MoveTo(640, 300)
+        car2:MoveTo(0, 300)
+        end
+
+        repeat 100 times
+        car3:MoveTo(640, 150)
+        car3:MoveTo(0, 150)
+        end
+        
+        repeat 100 times
+        car4:MoveTo(640, 450)
+        car4:MoveTo(0, 450)
+        end
+
+       
+    end
+
+    /*
+        The update action is called on every "frame" of animation in a game. This
+        action should be used to do operations on items. So, for example, we 
+        might use this action to change frames of animation, to rotate items, 
+        or to make creatures jump.
+    */
+
+    action Update(number seconds)
+        if done = true
+        say "Mission Accomplished!"
+        Exit()
+        end
+        
+        if frog:GetY() = 0 and not frog:IsShowing()
+        aud:Stop()
+        bg:Stop()
+        say "You lost the game."
+        Exit()
+        end
+        car1:Update(seconds)
+        car2:Update(seconds)
+        car3:Update(seconds)
+        car4:Update(seconds)
+        tortoise:Update(seconds)
+        
+        integer tortoiseCounter = 0
+
+        if car1:GetX() < 0
+        car1:FlipX()
+        elseif car1:GetX() > 640
+        car1:FlipX()
+        end
+        
+        if car2:GetX() < 0
+        car2:FlipX()
+        elseif car2:GetX() > 640
+        car2:FlipX()
+        end
+
+        if car3:GetX() < 0
+        car3:FlipX()
+        elseif car3:GetX() > 640
+        car3:FlipX()
+        end
+        
+        if car4:GetX() < 0
+        car4:FlipX()
+        elseif car4:GetX() > 640
+        car4:FlipX()
+        end
+        
+        if frog:GetY() > 720 and frog:GetX() <350
+        yey:Load("yey.wav")
+        tortoise:SetPosition(frog:GetX() + 100, frog:GetY())
+        aud:Stop()
+        bg:Stop()
+        yey:PlayUntilDone()
+        yey:Dispose()
+        done = true
+        elseif frog:GetY() > 720 and frog:GetX() >= 350
+        yey:Load("yey.wav")
+        tortoise:SetPosition(frog:GetX() -100, frog:GetY())
+        aud:Stop()
+        bg:Stop()
+        yey:PlayUntilDone()
+        yey:Dispose()
+        done = true
+        end
+        
+    end
+end
+    

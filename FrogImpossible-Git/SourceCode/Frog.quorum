@@ -1,0 +1,99 @@
+use Libraries.Game.Graphics.Drawable
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Item
+use Libraries.Sound.Audio
+use Libraries.Game.Game
+
+class Frog is Drawable, KeyboardListener
+integer moveX = 0
+integer moveY = 0
+integer speed = 200
+
+Audio jump
+Audio runOver
+
+Game game
+integer collisionCounter = 0
+
+    action Load 
+        me:Load("Frog1.png")
+        me:SetPosition(400, 0)
+    end
+
+
+    action Update(number seconds)
+        
+        SetX(GetX() + seconds*speed*moveX)
+        SetY(GetY() + seconds*speed*moveY)
+
+    end
+
+    action PressedKey(KeyboardEvent a)
+        jump:Load("Sound/jumping.wav")
+        jump:EnableLooping()
+        if (a:keyCode = a:RIGHT)
+            moveX = 1
+            jump:Play()
+                if me:GetX() > 670
+                moveX = 0
+                end
+        elseif (a:keyCode = a:LEFT)
+            moveX = -1
+            jump:Play()
+                if me:GetX() < 0
+                moveX = 0
+                end
+        elseif (a:keyCode = a:UP)
+            moveY = 1
+            jump:Play()
+                if me:GetY() > 700
+                moveY = 0
+                end
+        elseif (a:keyCode = a:DOWN)
+            moveY = -1
+            jump:Play()
+                if me:GetY() < 0
+                moveY = 0
+                end
+        end
+    end
+
+    action ReleasedKey(KeyboardEvent a)
+        if (a:keyCode = a:RIGHT)
+            moveX = 0
+            jump:Dispose()
+        elseif (a:keyCode = a:LEFT)
+            moveX = 0
+            jump:Dispose()
+        elseif (a:keyCode = a:UP)
+            moveY = 0
+            jump:Dispose()
+        elseif (a:keyCode = a:DOWN)
+            moveY = 0  
+            jump:Dispose()
+        end
+    end
+
+    action BeginCollision(Item i)
+        
+        me:Hide()
+        
+        runOver:Load("Sound/Sad_Trombone.wav")
+        runOver:PlayUntilDone()
+        runOver:Dispose()
+        
+        collisionCounter = collisionCounter + 1
+    end
+
+    action FinishCollision(Item i)
+            if collisionCounter < 3
+                me:SetPosition(400, 0)
+                me:Show()
+            else
+                me:SetPosition(400, 0)
+              
+            end
+    end
+
+end
